@@ -1,0 +1,8 @@
+INPUTS:
+A
+B
+C
+COMPONENTS:
+G1, NAND, W1, A, B
+G2, NOT, W2, C
+G3, AND, X, W1, W2

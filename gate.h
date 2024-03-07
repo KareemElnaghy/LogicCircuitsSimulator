@@ -1,7 +1,10 @@
 #include <iostream>
+#include "library.lib"
+#include "stimuli.stim"
+#include "circuit.cir"
 using namespace std;
 
-class gate { //
+class gate {
 private:
   string component_name;
   int num_of_inputs;

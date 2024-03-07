@@ -20,8 +20,7 @@ void gate::update() {
   if (get_component_name() == "AND") {
 
     for (int i = 0; i < num_of_inputs; i++) {
-      if (!inputs[i]) { // if any of the inputs to an AND gate is 0, the output
-                        // is 0
+      if (!inputs[i]) { // if any of the inputs to an AND gate is 0, the output is 0
         output = false;
         break;
       }
