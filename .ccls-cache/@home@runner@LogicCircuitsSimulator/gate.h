@@ -1,20 +1,24 @@
-#include <iostream>
+#include "circuit.cir"
 #include "library.lib"
 #include "stimuli.stim"
-#include "circuit.cir"
+#include <iostream>
+#include <string>
 using namespace std;
 
 class gate {
 private:
-  string component_name;
-  int num_of_inputs;
+  string component_name; // gate types
+  int num_of_inputs;     // number of inputs to every gate
   string output_expression;
   int delay_ps;
-  bool output;
+  bool output;  // gate output
+  bool *inputs; // input pointer to gate, will be pointing to an array of size num_of_inputs
 
 public:
   gate();
-  void update();
+  void update(); /*updates the output of any gate based on the inputs given*/
+  void set_inputs(int, bool *);
+  void get_inputs();
   bool get_output() const;
   string get_component_name();
   void set_component_name(string name);
