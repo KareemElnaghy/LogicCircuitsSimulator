@@ -1,6 +1,4 @@
 #include "gate.h"
-#include <iostream>
-#include <string>
 using namespace std;
 
 gate::gate() {
@@ -17,10 +15,11 @@ void gate::set_inputs(int size, bool *inputs) {
   this->inputs = &inputs[num_of_inputs];
 }
 
-void gate::get_inputs() {
-  for (int i = 0; i < num_of_inputs; i++) {
-    cout << "Input " << i + 1 << " = " << inputs[i] << endl;
-  }
+int gate::get_inputs() {
+  if (inputs)
+    return 1;
+  else
+    return 0;
 }
 
 bool gate::get_output() const { return output; }
@@ -39,6 +38,7 @@ void gate::update() {
         break;
       }
     }
+    /*OR GATE*/
   } else if (get_component_name() == "OR") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i]) // if input is 1
@@ -47,6 +47,7 @@ void gate::update() {
         break;
       }
     }
+    /*NOT GATE*/
   } else if (get_component_name() == "NOT") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i]) {
@@ -57,6 +58,7 @@ void gate::update() {
         output = true;
       }
     }
+    /*NAND GATE*/
   } else if (get_component_name() == "NAND") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i]) // if input is 1
