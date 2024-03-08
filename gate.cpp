@@ -1,5 +1,6 @@
 #include "gate.h"
 #include <iostream>
+#include <string>
 using namespace std;
 
 gate::gate() {
@@ -8,6 +9,18 @@ gate::gate() {
   output_expression = "";
   delay_ps = 0;
   output = false;
+  inputs = nullptr;
+}
+
+void gate::set_inputs(int size, bool *inputs) {
+  num_of_inputs = size;
+  this->inputs = &inputs[num_of_inputs];
+}
+
+void gate::get_inputs() {
+  for (int i = 0; i < num_of_inputs; i++) {
+    cout << "Input " << i + 1 << " = " << inputs[i] << endl;
+  }
 }
 
 bool gate::get_output() const { return output; }
@@ -20,7 +33,8 @@ void gate::update() {
   if (get_component_name() == "AND") {
 
     for (int i = 0; i < num_of_inputs; i++) {
-      if (!inputs[i]) { // if any of the inputs to an AND gate is 0, the output is 0
+      if (!inputs[i]) { // if any of the inputs to an AND gate is 0, the output
+                        // is 0
         output = false;
         break;
       }
@@ -34,12 +48,14 @@ void gate::update() {
       }
     }
   } else if (get_component_name() == "NOT") {
-    if (input) {
-      input = 0;
-      output = false;
-    } else {
-      input = 1;
-      output = true;
+    for (int i = 0; i < num_of_inputs; i++) {
+      if (inputs[i]) {
+        inputs[i] = 0;
+        output = false;
+      } else {
+        inputs[i] = 1;
+        output = true;
+      }
     }
   } else if (get_component_name() == "NAND") {
     for (int i = 0; i < num_of_inputs; i++) {
