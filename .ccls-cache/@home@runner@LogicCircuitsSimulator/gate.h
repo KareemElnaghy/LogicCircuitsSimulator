@@ -12,13 +12,14 @@ private:
   string output_expression;
   int delay_ps;
   bool output;  // gate output
-  bool *inputs; // input pointer to gate, will be pointing to an array of size num_of_inputs
+  bool *inputs; // input pointer to gate, will be pointing to an array of size
+                // num_of_inputs
 
 public:
   gate();
   void update(); /*updates the output of any gate based on the inputs given*/
   void set_inputs(int, bool *);
-  void get_inputs();
+  int get_inputs();
   bool get_output() const;
   string get_component_name();
   void set_component_name(string name);
