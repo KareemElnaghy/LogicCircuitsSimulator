@@ -22,6 +22,7 @@ int gate::get_inputs() {
     return 0;
 }
 
+//void gate
 bool gate::get_output() const { return output; }
 
 /*updates the output of any gate based on the inputs given*/

@@ -20,6 +20,7 @@ public:
   void update(); /*updates the output of any gate based on the inputs given*/
   void set_inputs(int, bool *);
   int get_inputs();
+  void set_output(bool out);
   bool get_output() const;
   string get_component_name();
   void set_component_name(string name);
@@ -29,4 +30,5 @@ public:
   void set_output_expression(string expression);
   int get_delay_ps();
   void set_delay_ps(int delay);
+  
 };

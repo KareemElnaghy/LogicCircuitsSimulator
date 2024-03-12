@@ -1,4 +1,4 @@
-#include "circuit.cir"
+#include "circuit1.cir"
 #include "gate.h"
 #include "library.lib"
 #include "stimuli.stim"
