@@ -10,10 +10,11 @@ using namespace std;
 class circ {
 private:
   vector<gate> gates;
-  map<string, bool> stimMap;
+  vector<bool> stim;
 public:
   circ();
   void parse(string circuitFileName, string stimFileName);
   void makeExpression();
-  void makeStimMap();
+  void readStim(string stimFileName);
+  void calculateOutput();
 };
