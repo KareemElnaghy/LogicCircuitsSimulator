@@ -9,7 +9,7 @@ using namespace std;
 
 class circ {
 private:
-  int numOfInputs;
+  int numOfInputsCircuit;
   int numOfGates;
   string circFileName;
   string stimFileName;
@@ -22,6 +22,7 @@ public:
   void parse();
   void makeExpression();
   void readStim();
+  void writeSim();
   void countInputs();
   void countGates();
   void calculateOutput();
