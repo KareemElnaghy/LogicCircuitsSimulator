@@ -8,6 +8,6 @@ int main() {
   string stimFileName = "stimuli.txt";
 
   circ circuit1(circuitFileName, stimFileName);
-  //circuit1.printGate();
+  circuit1.writeSim();
   return 0;
 }

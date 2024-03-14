@@ -12,7 +12,6 @@ gate::gate() {
 void gate::set_inputs(int i, string name, bool value) {
   if(inputs.size()!=num_of_inputs)
   { 
-    cout<<num_of_inputs<<endl;
     inputs.resize(num_of_inputs);
   }
   inputs[i].name = name;
@@ -25,17 +24,17 @@ void gate::set_output(string name) { output.name = name; }
 
 void gate::set_output(bool val) { output.value = val; }
 
-void gate::get_output() const {
-  cout << output.name << " " << output.value << endl;
+data gate::get_output() {
+  return output;
 }
 
 void gate::printInputs()
 {
-  if(num_of_inputs == 0)
-    cout<<"No inputs"<<endl;
+  if(num_of_inputs == 0){
+    cout<<"No inputs"<<endl;return;}
   for (int i = 0; i < num_of_inputs; i++)
     {
-      cout<<inputs[i].name<<" "<<inputs[i].value<<endl;
+      cout<<inputs[i].name<<" "<< inputs[i].value <<endl;
     }
 }
 /*updates the output of any gate based on the inputs given*/
