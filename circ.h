@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <map>
 #include <string>
 using namespace std;
 
@@ -13,12 +12,13 @@ private:
   int numOfGates;
   string circFileName;
   string stimFileName;
+  string libFileName;
   vector<gate> gates;
   vector<bool> stim;
 
 public:
   circ();
-  circ(string circuit, string stim);
+  circ(string circuit, string stim, string lib);
   void parse();
   void makeExpression();
   void readStim();
@@ -26,5 +26,5 @@ public:
   void countInputs();
   void countGates();
   void calculateOutput();
-  void printGate(gate);
+  void printGate();
 };
