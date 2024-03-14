@@ -25,7 +25,7 @@ public:
   vector<data> get_inputs();
   void set_output(bool out);
   void set_output(string name);
-  void get_output() const;
+  data get_output();
   string get_component_name();
   void set_component_name(string name);
   int get_num_of_inputs();
