@@ -6,72 +6,86 @@ gate::gate() {
   num_of_inputs = 0;
   output_expression = "";
   delay_ps = 0;
-  output = false;
-  inputs = nullptr;
+  
 }
 
-void gate::set_inputs(int size, bool *inputs) {
-  num_of_inputs = size;
-  this->inputs = &inputs[num_of_inputs];
+void gate::set_inputs(int i, string name, bool value) {
+  if(inputs.size()!=num_of_inputs)
+  { 
+    cout<<num_of_inputs<<endl;
+    inputs.resize(num_of_inputs);
+  }
+  inputs[i].name = name;
+  inputs[i].value = value;
 }
 
-int gate::get_inputs() {
-  if (inputs)
-    return 1;
-  else
-    return 0;
+vector<data> gate::get_inputs() { return inputs; }
+
+void gate::set_output(string name) { output.name = name; }
+
+void gate::set_output(bool val) { output.value = val; }
+
+void gate::get_output() const {
+  cout << output.name << " " << output.value << endl;
 }
 
-bool gate::get_output() const { return output; }
-
+void gate::printInputs()
+{
+  if(num_of_inputs == 0)
+    cout<<"No inputs"<<endl;
+  for (int i = 0; i < num_of_inputs; i++)
+    {
+      cout<<inputs[i].name<<" "<<inputs[i].value<<endl;
+    }
+}
 /*updates the output of any gate based on the inputs given*/
 void gate::update() {
 
-  output = false;
-
+  //output = false;
+  
   if (get_component_name() == "AND") {
 
     for (int i = 0; i < num_of_inputs; i++) {
-      if (!inputs[i]) { // if any of the inputs to an AND gate is 0, the output
+      if (!inputs[i].value) { // if any of the inputs to an AND gate is 0, the output
                         // is 0
-        output = false;
+        output.value = false;
         break;
       }
     }
     /*OR GATE*/
   } else if (get_component_name() == "OR") {
     for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i]) // if input is 1
+      if (inputs[i].value) // if input is 1
       {
-        output = true;
+        output.value = true;
         break;
       }
     }
     /*NOT GATE*/
   } else if (get_component_name() == "NOT") {
     for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i]) {
-        inputs[i] = 0;
-        output = false;
+      if (inputs[i].value) {
+        inputs[i].value = 0;
+        output.value = false;
       } else {
-        inputs[i] = 1;
-        output = true;
+        inputs[i].value = 1;
+        output.value = true;
       }
     }
     /*NAND GATE*/
   } else if (get_component_name() == "NAND") {
     for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i]) // if input is 1
+      if (inputs[i].value) // if input is 1
       {
-        output = false;
+        output.value = false;
         break;
       }
     }
   }
 }
 
-void gate::set_component_name(string component_name) {
-  this->component_name = component_name;
+void gate::set_component_name(string name) {
+  component_name = name;
 }
 
 string gate::get_component_name() { return component_name; }

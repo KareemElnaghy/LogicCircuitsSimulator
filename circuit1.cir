@@ -3,6 +3,6 @@ A
 B
 C
 COMPONENTS:
-G1, NAND, W1, A, B
+G1, NAND2, W1, A, B
 G2, NOT, W2, C
-G3, AND, X, W1, W2
+G3, AND2, X, W1, W2
