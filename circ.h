@@ -9,12 +9,21 @@ using namespace std;
 
 class circ {
 private:
+  int numOfInputs;
+  int numOfGates;
+  string circFileName;
+  string stimFileName;
   vector<gate> gates;
   vector<bool> stim;
+
 public:
   circ();
-  void parse(string circuitFileName, string stimFileName);
+  circ(string circuit, string stim);
+  void parse();
   void makeExpression();
-  void readStim(string stimFileName);
+  void readStim();
+  void countInputs();
+  void countGates();
   void calculateOutput();
+  void printGate(gate);
 };

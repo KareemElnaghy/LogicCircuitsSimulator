@@ -1,12 +1,13 @@
-#include "circuit1.cir"
-#include "gate.h"
-#include "library.lib"
-#include "stimuli.stim"
+#include "circ.h"
 #include <iostream>
 #include <string>
 using namespace std;
 
 int main() {
-  cout << "Hello World";
+  string circuitFileName = "circuit1.txt";
+  string stimFileName = "stimuli.txt";
+
+  circ circuit1(circuitFileName, stimFileName);
+  //circuit1.printGate();
   return 0;
 }
