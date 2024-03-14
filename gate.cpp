@@ -1,4 +1,9 @@
 #include "gate.h"
+#include <unordered_map>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <stack>
 using namespace std;
 
 gate::gate() {
@@ -6,6 +11,7 @@ gate::gate() {
   num_of_inputs = 0;
   output_expression = "";
   delay_ps = 0;
+  output.value = false;
   
 }
 
@@ -37,22 +43,25 @@ void gate::printInputs()
       cout<<inputs[i].name<<" "<< inputs[i].value <<endl;
     }
 }
-/*updates the output of any gate based on the inputs given*/
-void gate::update() {
 
-  //output = false;
+void gate::update() {    /*updates the output of any gate based on the inputs given*/
+   
   
-  if (get_component_name() == "AND") {
+  if (get_component_name() == "AND2") {
 
     for (int i = 0; i < num_of_inputs; i++) {
       if (!inputs[i].value) { // if any of the inputs to an AND gate is 0, the output
                         // is 0
         output.value = false;
-        break;
+        
+      }
+      else
+      {
+        output.value = true;
       }
     }
     /*OR GATE*/
-  } else if (get_component_name() == "OR") {
+  } else if (get_component_name() == "OR2") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i].value) // if input is 1
       {
@@ -64,21 +73,53 @@ void gate::update() {
   } else if (get_component_name() == "NOT") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i].value) {
-        inputs[i].value = 0;
         output.value = false;
       } else {
-        inputs[i].value = 1;
         output.value = true;
       }
     }
     /*NAND GATE*/
-  } else if (get_component_name() == "NAND") {
+  } else if (get_component_name() == "NAND2" || get_component_name() == "NAND3") {
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i].value) // if input is 1
       {
         output.value = false;
+
+       
         break;
       }
+      else{
+        output.value = true;
+      }
+    }
+  } else if (get_component_name() == "NOR3") {
+      output.value = true; // Assume output is true initially
+      for (int i = 0; i < num_of_inputs; i++) {
+          if (inputs[i].value) { // if any input is true, output is false
+              output.value = false;
+              break;
+          }
+      } output.value = true;
+  } else if (get_component_name() == "XOR3") {
+      int trueCount = 0;
+      for (int i = 0; i < num_of_inputs; i++) {
+          if (inputs[i].value) { // Count the number of true inputs
+              trueCount++;
+          }
+      }
+      // XOR gate outputs true if the number of true inputs is odd
+      output.value = (trueCount % 2 == 1);
+  }
+
+}
+
+void gate::updateInputs(data out)
+{
+  for(int i =0; i<num_of_inputs;i++)
+  {
+    if(inputs[i].name == out.name)
+    {
+      inputs[i].value = out.value;
     }
   }
 }
@@ -104,3 +145,33 @@ string gate::get_output_expression() { return output_expression; }
 void gate::set_delay_ps(int delay_ps) { this->delay_ps = delay_ps; }
 
 int gate::get_delay_ps() { return delay_ps; }
+
+// void gate::readExpression(string filename)
+// {
+//   ifstream file;
+//   file.open(filename);
+  
+// string line;
+//   while (std::getline(file, line)) {
+//   std::stringstream ss(line);
+//   std::string gateType, numInputsStr, expression, delayStr;
+//     getline(ss, gateType, ',');
+//   if (gateType == component_name)
+//   {
+//       std::getline(ss, numInputsStr, ',');
+//       std::getline(ss, expression, ',');
+//       std::getline(ss, delayStr, ',' ); 
+//       // int numInputs = std::stoi(numInputsStr);
+//      int delay = std::stoi(delayStr);
+//       //g.set_component_name(gateType);
+//      // g.set_num_of_inputs(numInputs);
+//       set_output_expression(expression); cout<<expression<<endl;
+//       set_delay_ps(delay);
+//       //gates.push_back(g);
+//   }}
+
+  
+//   file.close();
+// }
+
+
