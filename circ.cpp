@@ -22,6 +22,20 @@ void circ::printGate() {
   }
 }
 
+void circ::removeSpaces(vector<string> &x){
+  
+  for(int i = 0; i<x.size();i++)
+    {
+      string str ="";
+      for(char c : x[i])
+        {
+          if(c != ' ')
+              str += c;
+        }
+      x[i] = str;
+    }
+}
+
 circ::circ(string circuit, string stim, string lib) {
 
   circFileName = circuit;   // Set circuit file name
@@ -125,8 +139,9 @@ void circ::readStim() {
 
 void circ::parse() {
   ifstream file(circFileName); // Open circuit file for reading
-
   int inputCounter = 0; // Counter for tracking input index
+  
+
 
   // Check if the file is successfully opened
   if (!file.is_open()) {
@@ -175,6 +190,8 @@ void circ::parse() {
       break;
     }
 
+    removeSpaces(info);
+    
     // Set gate component name and output
     gates[i].set_component_name(info[1]);
     gates[i].set_output(info[2]);

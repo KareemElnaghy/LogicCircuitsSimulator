@@ -27,5 +27,6 @@ public:
   void countGates();
   void calculateOutput();
   void adjustOutputs();
+  void removeSpaces (vector<string>& x);
   void printGate();
 };
