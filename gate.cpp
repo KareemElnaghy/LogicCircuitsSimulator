@@ -80,18 +80,18 @@ void gate::update() {    /*updates the output of any gate based on the inputs gi
     }
     /*NAND GATE*/
   } else if (get_component_name() == "NAND2" || get_component_name() == "NAND3") {
+
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i].value) // if input is 1
       {
+        
         output.value = false;
 
-       
-        break;
       }
       else{
         output.value = true;
       }
-    }
+    } cout<<output.name<< " "<<output.value<<endl;
   } else if (get_component_name() == "NOR3") {
       output.value = true; // Assume output is true initially
       for (int i = 0; i < num_of_inputs; i++) {
@@ -107,7 +107,7 @@ void gate::update() {    /*updates the output of any gate based on the inputs gi
               trueCount++;
           }
       }
-      // XOR gate outputs true if the number of true inputs is odd
+      // XOR gate outputs true if the number of 1 is odd
       output.value = (trueCount % 2 == 1);
   }
 

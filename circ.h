@@ -26,5 +26,6 @@ public:
   void countInputs();
   void countGates();
   void calculateOutput();
+  void adjustOutputs();
   void printGate();
 };
