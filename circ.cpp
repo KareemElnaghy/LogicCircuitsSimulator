@@ -1,10 +1,5 @@
 #include "circ.h"
-#include <cctype>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <stack>
-#include <vector>
+
 
 circ::circ() {
   numOfInputsCircuit = 0;
@@ -22,19 +17,36 @@ void circ::printGate() {
   }
 }
 
-void circ::removeSpaces(vector<string> &x){
-  
-  for(int i = 0; i<x.size();i++)
-    {
-      string str ="";
-      for(char c : x[i])
-        {
-          if(c != ' ')
-              str += c;
+void circ::removeSpaces(vector<string> &x) {
+    for (int i = 0; i < x.size(); i++) {
+        string str = "";
+        bool hasSpaces = false; // variable to track if there are spaces in the word
+        for (char c : x[i]) {
+            if (c != ' ') {
+                str += c;
+            } else {
+                hasSpaces = true; // Sets varaible to true if there are spaces
+            }
         }
-      x[i] = str;
+        // If there were spaces in the word, update it in the vector
+        if (hasSpaces) {
+            x[i] = str;
+        }
     }
 }
+
+
+void removeSpacesMap(map<string, int>& map) {
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        std::string key = it->first;
+        size_t pos = key.find(' ');
+        while (pos != std::string::npos) {
+            key.erase(pos, 1);
+            pos = key.find(' ');
+        }
+    }
+}
+
 
 circ::circ(string circuit, string stim, string lib) {
 
@@ -46,13 +58,13 @@ circ::circ(string circuit, string stim, string lib) {
   gates.resize(numOfGates); // Resize the gates vector to accommodate gates
   readStim();               // reads stimulus file
   parse();                  // Parse the circuit file to initialize gate objects
-  writeSim();               // writes stimuli values to the stim file
   
-  for (int i = 0; i < gates.size(); i++) {
-    adjustOutputs();
-    gates[i].update();
-    
-  }
+  
+for(int i = 0; i<gates.size(); i++){
+  gates[i].update();
+   adjustInputs();}
+
+  writeSim();               // writes stimuli values to the stim file
   
 }
 
@@ -120,16 +132,48 @@ void circ::readStim() {
     while (getline(file, line)) { // Read each line from the file
       stringstream ss(line);      // Create stringstream object to parse line
       string temp1;               // Temporary variable to store input name
-      string temp2;    // Temporary variable to store logic value as string
+      string name;    // Temporary variable to store logic value as string
       bool logicValue; // Variable to store the logic value
 
       // Read input name and logic value from the line
       getline(ss, temp1, ','); // Read input name
-      getline(ss, temp2, ','); // Read logic value as string
+      getline(ss, name, ','); // Read logic value as string
       ss >> logicValue;        // Convert logic value string to bool
 
-      stim.push_back(logicValue); // Store logic value into stim vector
+      stim[name] = logicValue;
+
+
     }
+
+ vector<string> inNames;
+    for(auto it = stim.begin(); it != stim.end(); it++)
+      {
+        inNames.push_back(it->first);
+      }
+
+    removeSpaces(inNames);
+
+    auto it = stim.begin();
+      // Iterate over both the map and the vector simultaneously
+      for (const auto& newName : inNames) {
+          // If there are still elements in the map
+          if (it != stim.end()) {
+              // Insert a new element with the new key and the same value
+              stim[newName] = it->second;
+              // Erase the old element
+              stim.erase(it++);
+          } else {
+              // If there are no more elements in the map, break the loop
+              break;
+          }
+      }
+   
+    
+
+    for (const auto& pair : stim) {
+        std::cout << pair.first <<","<< pair.second << std::endl;
+    }
+    
     file.close(); // Close the file after reading
   } else {
     cout << "Error: Unable to open stimuli file."
@@ -138,22 +182,20 @@ void circ::readStim() {
 }
 
 void circ::parse() {
-  ifstream file(circFileName); // Open circuit file for reading
-  int inputCounter = 0; // Counter for tracking input index
-  
-
+  std::ifstream file(circFileName); // Open circuit file for reading
+  //int inputCounter = 0; // Counter for tracking input index
 
   // Check if the file is successfully opened
   if (!file.is_open()) {
-    cout << "Error: Unable to open circuit file." << endl;
+    std::cout << "Error: Unable to open circuit file." << std::endl;
     return;
   }
 
-  string line;
+  std::string line;
   bool checkComponent = false;
 
   // Skip lines until COMPONENTS is found
-  while (getline(file, line)) {
+  while (std::getline(file, line)) {
     if (line == "COMPONENTS:") {
       checkComponent = true;
       break;
@@ -162,7 +204,7 @@ void circ::parse() {
 
   // Check if COMPONENTS section is found
   if (!checkComponent) {
-    cout << "Error: COMPONENTS section not found." << endl;
+    std::cout << "Error: COMPONENTS section not found." << std::endl;
     file.close();
     return;
   }
@@ -170,8 +212,8 @@ void circ::parse() {
   // Read gate information from the file
   for (int i = 0; i < numOfGates; i++) {
     // Read line containing gate information
-    if (!getline(file, line)) {
-      cout << "Error: Unable to read gate information from file." << endl;
+    if (!std::getline(file, line)) {
+      cout << "Error: Unable to read gate information from file." << std::endl;
       break;
     }
 
@@ -180,18 +222,15 @@ void circ::parse() {
     vector<string> info;
 
     // Parse the line into words
-    while (getline(ss, word, ',')) {
+    while (std::getline(ss, word, ',')) {
       info.push_back(word);
     }
 
-    // Check if there are enough components to represent a gate
-    if (info.size() < 3) {
-      cout << "Error: Invalid gate information in file." << endl;
-      break;
-    }
 
     removeSpaces(info);
+
     
+
     // Set gate component name and output
     gates[i].set_component_name(info[1]);
     gates[i].set_output(info[2]);
@@ -199,8 +238,13 @@ void circ::parse() {
 
     // Set gate inputs
     for (int j = 3; j < info.size(); j++) {
-      gates[i].set_inputs(j - 3, info[j], stim[inputCounter]);
-      inputCounter++;
+      string inputName = info[j];
+      if (stim.find(inputName) != stim.end()) {
+        gates[i].set_inputs(j - 3, inputName, stim[inputName]);
+      } else {
+        std::cout << "Error: Input '" << inputName << "' not found in stimuli." << std::endl;
+    gates[i].set_inputs(j-3, inputName, 0);
+      }
     }
 
     gates[i].set_num_of_inputs(info.size() - 3);
@@ -208,6 +252,7 @@ void circ::parse() {
 
   file.close(); // Close the file
 }
+
 
 // void circ::makeExpression() { // setting expression of each gate used in the
 //                               // circuit to an expression with 0s and 1s instead
@@ -333,8 +378,7 @@ void circ::parse() {
 // }
 
 
-void circ::adjustOutputs()
-{
+void circ::adjustInputs() {
   for (int i = 0; i < gates.size(); ++i) {
       gate& currentGate = gates[i]; // Current gate
       // Iterate over the inputs of the current gate
@@ -353,47 +397,50 @@ void circ::adjustOutputs()
 }
 
 
-void circ::writeSim() {
-  fstream file; // File stream object for writing to the simulation file
-  string simFileName; // Variable to store the simulation file name
 
-  // Determine the simulation file name based on the circuit file name
-  if (circFileName == "circuit1.txt")
-    simFileName = "simCircuit1.txt";
-  else if (circFileName == "circuit2.txt")
-    simFileName = "simCircuit2.txt";
-  else if (circFileName == "circuit3.txt")
-    simFileName = "simCircuit3.txt";
-  else if (circFileName == "circuit4.txt")
-    simFileName = "simCircuit4.txt";
-  else
-    simFileName = "simCircuit5.txt";
 
-  // Open the simulation file for writing
-  file.open(simFileName, ios::out);
 
-  // Check if the file was successfully opened
-  if (!file.is_open()) {
-    cout << "Error creating sim file." << endl; // Display error message if file creation failed
-  } else {
-    // Iterate through each gate in the circuit
-    for (int i = 0; i < numOfGates; i++) {
-      // Get the output data of the current gate
-      data out = gates[i].get_output();
-
-      // Get the input data of the current gate
-      vector<data> in = gates[i].get_inputs();
-
-      // Write the input data of the current gate to the simulation file
-      for (int j = 0; j < in.size(); j++) {
-        file << in[j].name << ", " << in[j].value << endl; // Write input name and value
+  void circ::writeSim() {
+    fstream file; // File stream object for writing to the simulation file
+    string simFileName; // Variable to store the simulation file name
+  
+    // Determine the simulation file name based on the circuit file name
+    if (circFileName == "circuit1.txt")
+      simFileName = "simCircuit1.txt";
+    else if (circFileName == "circuit2.txt")
+      simFileName = "simCircuit2.txt";
+    else if (circFileName == "circuit3.txt")
+      simFileName = "simCircuit3.txt";
+    else if (circFileName == "circuit4.txt")
+      simFileName = "simCircuit4.txt";
+    else
+      simFileName = "simCircuit5.txt";
+  
+    // Open the simulation file for writing
+    file.open(simFileName, ios::out);
+  
+    // Check if the file was successfully opened
+    if (!file.is_open()) {
+      cout << "Error creating sim file." << endl; // Display error message if file creation failed
+    } else {
+      // Iterate through each gate in the circuit
+      for (int i = 0; i < numOfGates; i++) {
+        // Get the output data of the current gate
+        data out = gates[i].get_output();
+  
+        // Get the input data of the current gate
+        vector<data> in = gates[i].get_inputs();
+  
+        // Write the input data of the current gate to the simulation file
+        for (int j = 0; j < in.size(); j++) {
+          file << in[j].name << ", " << in[j].value << endl; // Write input name and value
+        }
+  
+        // Write the output data of the current gate to the simulation file
+        file << out.name << ", " << out.value << endl; // Write output name and value
       }
-
-      // Write the output data of the current gate to the simulation file
-      file << out.name << ", " << out.value << endl; // Write output name and value
     }
+  
+    // Close the simulation file
+    file.close();
   }
-
-  // Close the simulation file
-  file.close();
-}

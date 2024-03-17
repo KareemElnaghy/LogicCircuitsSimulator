@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <map>
+#include <stack>
 using namespace std;
 
 class circ {
@@ -14,7 +16,8 @@ private:
   string stimFileName;
   string libFileName;
   vector<gate> gates;
-  vector<bool> stim;
+  //vector<bool> stim;
+  map<string, bool> stim;
 
 public:
   circ();
@@ -26,7 +29,8 @@ public:
   void countInputs();
   void countGates();
   void calculateOutput();
-  void adjustOutputs();
-  void removeSpaces (vector<string>& x);
+  void adjustInputs();
+  void removeSpaces(vector<string>& x);
+  void removeSpacesMap(map<string,bool> & map);
   void printGate();
 };
