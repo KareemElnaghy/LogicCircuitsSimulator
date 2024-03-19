@@ -12,6 +12,8 @@ gate::gate() {
   output_expression = "";
   delay_ps = 0;
   output.value = false;
+  output.timeStamp = 0;
+  output.name = "";
   
 }
 
@@ -24,11 +26,21 @@ void gate::set_inputs(int i, string name, bool value) {
   inputs[i].value = value;
 }
 
+void gate::setInputTime(int i, int time)
+{
+  if(inputs.size()!=num_of_inputs)
+  { 
+    inputs.resize(num_of_inputs);
+  }
+
+  inputs[i].timeStamp = time;
+}
+
 vector<data> gate::get_inputs() { return inputs; }
 
-void gate::set_output(string name) { output.name = name; }
+void gate::setOutputName(string name) { output.name = name; }
 
-void gate::set_output(bool val) { output.value = val; }
+void gate::setOutputValue(bool val) { output.value = val; }
 
 data gate::get_output() {
   return output;
@@ -40,7 +52,7 @@ void gate::printInputs()
     cout<<"No inputs"<<endl;return;}
   for (int i = 0; i < num_of_inputs; i++)
     {
-      cout<<inputs[i].name<<" "<< inputs[i].value <<endl;
+      cout<<inputs[i].name<<" "<< inputs[i].value <<" "<<inputs[i].timeStamp<<endl;
     }
 }
 
@@ -66,7 +78,7 @@ void gate::update() {    /*updates the output of any gate based on the inputs gi
       if (inputs[i].value) // if input is 1
       {
         output.value = true;
-        break;
+      
       }
     }
     /*NOT GATE*/
@@ -80,13 +92,13 @@ void gate::update() {    /*updates the output of any gate based on the inputs gi
     }
     /*NAND GATE*/
   } else if (get_component_name() == "NAND2" || get_component_name() == "NAND3") {
+
     for (int i = 0; i < num_of_inputs; i++) {
       if (inputs[i].value) // if input is 1
       {
+        
         output.value = false;
 
-       
-        break;
       }
       else{
         output.value = true;
@@ -107,7 +119,7 @@ void gate::update() {    /*updates the output of any gate based on the inputs gi
               trueCount++;
           }
       }
-      // XOR gate outputs true if the number of true inputs is odd
+      // XOR gate outputs true if the number of 1 is odd
       output.value = (trueCount % 2 == 1);
   }
 
@@ -145,6 +157,10 @@ string gate::get_output_expression() { return output_expression; }
 void gate::set_delay_ps(int delay_ps) { this->delay_ps = delay_ps; }
 
 int gate::get_delay_ps() { return delay_ps; }
+
+vector<int> gate::get_gate_change_time() { return gate_change_time; }
+
+void gate::set_gate_change_time(int i, int time) {gate_change_time[i]=time;}
 
 // void gate::readExpression(string filename)
 // {

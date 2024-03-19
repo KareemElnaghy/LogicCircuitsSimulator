@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <stack>
+#include <algorithm>
 using namespace std;
 
 class circ {
@@ -16,8 +18,9 @@ private:
   string stimFileName;
   string libFileName;
   vector<gate> gates;
-  //vector<bool> stim;
-  map<string, bool> stim;
+  map<string, bool> stimVal;
+  map<string, int> stimTime;
+  map<string, string> gateExpression;
 
 public:
   circ();
@@ -31,6 +34,9 @@ public:
   void calculateOutput();
   void adjustInputs();
   void removeSpaces(vector<string>& x);
-  void removeSpacesMap(map<string,bool> & map);
+  void removeSpacesMap();
   void printGate();
+  bool evaluatePostfix(const string& expression);
+  void readExpression();
+  void calculateDelay();
 };
