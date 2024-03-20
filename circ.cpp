@@ -14,8 +14,7 @@ void circ::printGate() {
     // cout << gates[i].get_num_of_inputs() << endl;
     gates[i].printInputs();
     cout << "Name: " << gates[i].get_output().name
-         << " Value: " << gates[i].get_output().value << endl
-         << endl;
+         << " Value: " << gates[i].get_output().value << endl;
 
     cout<<gates[i].get_output_expression()<<endl;
   }
@@ -88,13 +87,13 @@ circ::circ(string circuit, string stim, string lib) {
   countGates();             // Count the number of gates in the circuit
   gates.resize(numOfGates); // Resize the gates vector to accommodate gates
   readStim();               // reads stimulus file
-  readExpression();
   parse();                  // Parse the circuit file to initialize gate objects
 
   for (int i = 0; i < gates.size(); i++) {
     gates[i].update();
     adjustInputs();
   }
+  readExpression();
 
   writeSim(); // writes stimuli values to the stim file
   printGate();
@@ -456,35 +455,37 @@ void circ::writeSim() {
 }
 
 void circ::readExpression() {
-  ifstream file;
+    ifstream file;
+    file.open(libFileName);
+    string line, word;
+    vector<string> info;
 
-  file.open(libFileName);
-  string line, word;
-  stringstream ss(line);
-  vector<string> info;
+    while (getline(file, line)) {
+        // Parse the line into words
+        info.clear();
+        stringstream ss(line); // Move stringstream initialization here
+        while (getline(ss, word, ',')) {
+            info.push_back(word);
   
-
-  while (getline(file, line)) {
-    // Parse the line into words
-    while (getline(ss, word, ',')) {
-      info.push_back(word);
+        }
+        removeSpaces(info);
+        for (int i = 0; i < info.size(); i++)
+        gateExpression[info[0]] = info[2];
     }
-    removeSpaces(info);
 
-      gateExpression[info[0]] = info[2];
-    
-    }
-   for(auto & pair : gateExpression) {
-    cout << pair.first << ": " << pair.second << endl;
+  // for(auto it = gateExpression.begin(); it != gateExpression.end(); it++)
+  //   cout<<it->first<<" "<<it->second<<endl;
+  
+  for (int i = 0; i < gates.size(); i++) {
+      string name = gates[i].get_component_name();
+      auto it = gateExpression.find(name);
+      if (it != gateExpression.end())
+          gates[i].set_output_expression(it->second);
+   
   }
-      // for (int i = 0; i < gates.size(); i++) {
-      //   string name = gates[i].get_component_name();
-      //   auto it = gateExpression.find(name);
-      //   if (it != gateExpression.end())
-      //   {
-      //     gates[i].set_output_expression(it->second);
-      //   }
-  //}
+
+  
+    file.close();
 }
 
 // bool circ::evaluatePostfix(const string &expression) {
