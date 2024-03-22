@@ -38,6 +38,11 @@ void gate::setOutputName(string name) { output.name = name; }
 
 void gate::setOutputValue(bool val) { output.value = val; }
 
+void gate::setOutputTime(int time)
+{
+  output.timeStamp = time;
+}
+
 data gate::get_output() { return output; }
 
 void gate::printInputs() {
@@ -51,77 +56,79 @@ void gate::printInputs() {
   }
 }
 
-void gate::update() { /*updates the output of any gate based on the inputs
-                         given*/
 
-  if (get_component_name() == "AND2") {
 
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (!inputs[i]
-               .value) { // if any of the inputs to an AND gate is 0, the output
-                         // is 0
-        output.value = false;
+// void gate::update() { /*updates the output of any gate based on the inputs
+//                          given*/
 
-      } else {
-        output.value = true;
-      }
-    }
-    /*OR GATE*/
-  } else if (get_component_name() == "OR2") {
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i].value) // if input is 1
-      {
-        output.value = true;
-      }
-    }
-    /*NOT GATE*/
-  } else if (get_component_name() == "NOT") {
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i].value) {
-        output.value = false;
-      } else {
-        output.value = true;
-      }
-    }
-    /*NAND GATE*/
-  } else if (get_component_name() == "NAND2" ||
-             get_component_name() == "NAND3") {
+//   if (get_component_name() == "AND2") {
 
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i].value) // if input is 1
-      {
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (!inputs[i].value) { // if any of the inputs to an AND gate is 0, the
+//                               // output is 0
+//         output.value = false;
 
-        output.value = false;
+//       } else {
+//         output.value = true;
+//       }
+//     }
+//     /*OR GATE*/
+//   } else if (get_component_name() == "OR2") {
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (inputs[i].value) // if input is 1
+//       {
+//         output.value = true;
+//       }
+//     }
+//     /*NOT GATE*/
+//   } else if (get_component_name() == "NOT") {
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (inputs[i].value) {
+//         output.value = false;
+//       } else {
+//         output.value = true;
+//       }
+//     }
+//     /*NAND GATE*/
+//   } else if (get_component_name() == "NAND2" ||
+//              get_component_name() == "NAND3") {
 
-      } else {
-        output.value = true;
-      }
-    }
-  } else if (get_component_name() == "NOR3") {
-    output.value = true; // Assume output is true initially
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i].value) { // if any input is true, output is false
-        output.value = false;
-        break;
-      }
-    }
-    output.value = true;
-  } else if (get_component_name() == "XOR3") {
-    int trueCount = 0;
-    for (int i = 0; i < num_of_inputs; i++) {
-      if (inputs[i].value) { // Count the number of true inputs
-        trueCount++;
-      }
-    }
-    // XOR gate outputs true if the number of 1s is odd
-    output.value = (trueCount % 2 == 1);
-  }
-}
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (inputs[i].value) // if input is 1
+//       {
+
+//         output.value = false;
+
+//       } else {
+//         output.value = true;
+//       }
+//     }
+//   } else if (get_component_name() == "NOR3") {
+//     output.value = true; // Assume output is true initially
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (inputs[i].value) { // if any input is true, output is false
+//         output.value = false;
+//         break;
+//       }
+//     }
+//     output.value = true;
+//   } else if (get_component_name() == "XOR3") {
+//     int trueCount = 0;
+//     for (int i = 0; i < num_of_inputs; i++) {
+//       if (inputs[i].value) { // Count the number of true inputs
+//         trueCount++;
+//       }
+//     }
+//     // XOR gate outputs true if the number of 1s is odd
+//     output.value = (trueCount % 2 == 1);
+//   }
+// }
 
 void gate::updateInputs(data out) {
   for (int i = 0; i < num_of_inputs; i++) {
     if (inputs[i].name == out.name) {
       inputs[i].value = out.value;
+      inputs[i].timeStamp=out.timeStamp;
     }
   }
 }
@@ -148,23 +155,25 @@ int gate::get_delay_ps() { return delay_ps; }
 
 vector<int> gate::get_gate_change_time() { return gate_change_time; }
 
-void gate::set_gate_change_time(int i, int time) { gate_change_time[i] = time; }
-
+void gate::set_gate_change_time(int i, int time) {
+  gate_change_time.resize(inputs.size());
+  gate_change_time[i] = time;
+}
 
 int gate::getOperatorPrecedence(char op) {
-    // Function to get precedence of operators
-    if (op == '~')
-        return 3;
-    if (op == '&')
-        return 2;
-    if (op == '|')
-        return 1;
-    return 0;
+  // Function to get precedence of operators
+  if (op == '~')
+    return 3;
+  if (op == '&')
+    return 2;
+  if (op == '|')
+    return 1;
+  return 0;
 }
 
 string gate::convertCharToString(char c) {
-    // Function to convert character to string
-    return string(1, c);
+  // Function to convert character to string
+  return string(1, c);
 }
 
 vector<string> gate::convertInfixToPostfix() {
@@ -223,48 +232,46 @@ vector<string> gate::convertInfixToPostfix() {
     return postfixExpression;
 }
 
-bool gate::evaluatePostfixExpression(const vector<string>& postfixExpression) {
-    stack<bool> operandStack;
+bool gate::evaluatePostfixExpression(const vector<string> &postfixExpression) {
+  stack<bool> operandStack;
 
-    for (int i =0; i<postfixExpression.size();i++) {
-        // If token is an input variable
-        if (isalpha(postfixExpression[i][0])) {
-            // Convert input character to index
-            int inputIndex = postfixExpression[i][1] - '1';
-          
-            bool inputValue = get_inputs()[inputIndex].value;
-         
-            operandStack.push(inputValue);
+  for (int i = 0; i < postfixExpression.size(); i++) {
+    // If token is an input variable
+    if (isalpha(postfixExpression[i][0])) {
+      // Convert input character to index
+      int inputIndex = postfixExpression[i][1] - '1';
+
+      bool inputValue = get_inputs()[inputIndex].value;
+
+      operandStack.push(inputValue);
+    } else {
+      // If token is an operator
+      if (postfixExpression[i] == "~") {
+        // Negation operator
+        if (!operandStack.empty()) {
+          bool operand = operandStack.top();
+          operandStack.pop();
+          operandStack.push(!operand);
         } else {
-            // If token is an operator
-            if (postfixExpression[i] == "~") {
-                // Negation operator
-                if (!operandStack.empty()) {
-                    bool operand = operandStack.top();
-                    operandStack.pop();
-                    operandStack.push(!operand);
-                } else {
-                    cerr << "Error: Missing operand for negation operator '~'" << endl;
-                    return false;
-                }
-            } else {
-                // Binary operators: '&' and '|'
-        
-                bool operand2 = operandStack.top();
-                operandStack.pop();
-                bool operand1 = operandStack.top();
-                operandStack.pop();
-                if (postfixExpression[i] == "&") {
-                    operandStack.push(operand1 && operand2);
-                } else if (postfixExpression[i] == "|") {
-                    operandStack.push(operand1 || operand2);
-                }
-            }
+          cerr << "Error: Missing operand for negation operator '~'" << endl;
+          return false;
         }
+      } else {
+        // Binary operators: '&' and '|'
+
+        bool operand2 = operandStack.top();
+        operandStack.pop();
+        bool operand1 = operandStack.top();
+        operandStack.pop();
+        if (postfixExpression[i] == "&") {
+          operandStack.push(operand1 && operand2);
+        } else if (postfixExpression[i] == "|") {
+          operandStack.push(operand1 || operand2);
+        }
+      }
     }
-    // Store the evaluated output in the gate's output data
-    
-    return operandStack.top();
+  }
+  // Store the evaluated output in the gate's output data
+
+  return operandStack.top();
 }
-
-

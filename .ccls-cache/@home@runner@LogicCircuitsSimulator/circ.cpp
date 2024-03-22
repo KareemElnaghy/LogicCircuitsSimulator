@@ -14,10 +14,10 @@ void circ::printGate() {
     // cout << gates[i].get_num_of_inputs() << endl;
     gates[i].printInputs();
     cout << "Name: " << gates[i].get_output().name
-         << " Value: " << gates[i].get_output().value << endl
-         << endl;
+         << " Value: " << gates[i].get_output().value
+         << " Time: " << gates[i].get_output().timeStamp << endl;
 
-    cout<<gates[i].get_output_expression()<<endl;
+    // cout << gates[i].get_output_expression() << endl;
   }
 }
 
@@ -87,16 +87,21 @@ circ::circ(string circuit, string stim, string lib) {
   countInputs();            // Count the number of inputs in the circuit
   countGates();             // Count the number of gates in the circuit
   gates.resize(numOfGates); // Resize the gates vector to accommodate gates
-  readStim();               // reads stimulus file
+ // cout << "Test 1" << endl;
+  readStim();
+ // cout << "Test 2" << endl;
+  // reads stimulus file
+  parse();
+ // cout << "Test 3" << endl; // Parse the circuit file to initialize gate objects
   readExpression();
-  parse();                  // Parse the circuit file to initialize gate objects
+ // cout << "Test 4" << endl;
+  evaluateOutput();
+  //cout << "Test 5" << endl;
 
-  for (int i = 0; i < gates.size(); i++) {
-    gates[i].update();
-    adjustInputs();
-  }
-
+  calculateDelay();
+ // cout << "Test 6" << endl;
   writeSim(); // writes stimuli values to the stim file
+
   printGate();
 }
 
@@ -195,7 +200,7 @@ void circ::parse() {
     return;
   }
 
- string line;
+  string line;
   bool checkComponent = false;
 
   // Skip lines until COMPONENTS is found
@@ -258,132 +263,8 @@ void circ::parse() {
     gates[i].set_num_of_inputs(info.size() - 3);
   }
 
-  file.close(); // Close the file
+  file.close();
 }
-
-// void circ::makeExpression() { // setting expression of each gate used in the
-//                               // circuit to an expression with 0s and 1s
-//                               instead
-//                               // of i1,i2,etc..
-
-//   ifstream library;
-//   library.open(libFileName);
-//   string line, word, gateType;
-//   bool found = false;
-//   vector<string> gateInfo;
-
-//   for (int i = 0; i < gates.size(); i++) {
-//     while (getline(library, line) && found == false) {
-//       gateInfo.clear();
-//       stringstream ss(line);
-//       while (getline(ss, word, ',')) {
-//         gateInfo.push_back(word);
-//       }
-//       if (gateInfo[0] == gates[i].get_component_name()) {
-//         found = true;
-//         gates[i].set_output_expression(gateInfo[2]);
-//         gates[i].set_delay_ps(stoi(gateInfo[3]));
-//       }
-//     }
-
-//     for (int j = 0; j < gates[j].get_num_of_inputs(); j++) {
-//       string newExpression;
-//       int index = gates[i].get_output_expression().find((to_string(j))[0]);
-//       newExpression = gates[j].get_output_expression().replace(
-//           index - 1, index, (gates[j].get_inputs()[j]).name);
-//       gates[j].set_output_expression(newExpression);
-//     }
-//   }
-//   library.close();
-// }
-
-// void circ::calculateOutput() {
-//   stack<char> operators;
-//   stack<bool> operands;
-//   for (int i = 0; i < gates.size(); i++) {
-//     string expression = gates[i].get_output_expression();
-//     vector<data> inputs = gates[i].get_inputs();
-//     vector<bool> inputValues;
-//     for (int i = 0; i < inputs.size(); i++) {
-//       inputValues.push_back(inputs[i].value);
-//     }
-
-//     for (char c : expression) {
-//       if (c == '(' || c == '&' || c == '|') {
-//         operators.push(c);
-//       } else if (c == ')') {
-//         // Evaluate the expression inside the parentheses
-//         while (operators.top() != '(') {
-//           char op = operators.top();
-//           operators.pop();
-
-//           if (op == '&') {
-//             bool right = operands.top();
-//             operands.pop();
-//             bool left = operands.top();
-//             operands.pop();
-//             operands.push(left && right);
-//           } else if (op == '|') {
-//             bool right = operands.top();
-//             operands.pop();
-//             bool left = operands.top();
-//             operands.pop();
-//             operands.push(left || right);
-//           }
-//         }
-//         operators.pop(); // Remove '('
-//       } else if (c == '~') {
-//         operators.push(c);
-//       } else if (isalnum(c)) {
-//         string inputName(1, c);
-//         while (isalnum(expression[++c])) {
-//           inputName += expression[c];
-//         }
-//         if (inputValues.find(inputName) != inputs.end()) {
-//           operands.push(inputs.at(inputName));
-//         } else {
-//           cerr << "Undefined input: " << inputName << endl;
-//           gates[i].set_output(false);
-//         }
-//         bool found = false; // replaced with for loop
-//         for (int j = 0; j < inputs.size(); j++) {
-//           if (inputs[j].name == inputName) {
-//             operands.push(inputs[j].value);
-//             found = true;
-//             break;
-//           }
-//         }
-
-//         if (!found) {
-//           cout << "Undefined input: " << inputName << endl;
-//           gates[i].set_output(false);
-//         }
-//       }
-//     }
-
-//     // Evaluate remaining expressions
-//     while (!operators.empty()) {
-//       char op = operators.top();
-//       operators.pop();
-//       if (op == '~') {
-//         operands.top() = !operands.top();
-//       } else if (op == '&') {
-//         bool right = operands.top();
-//         operands.pop();
-//         bool left = operands.top();
-//         operands.pop();
-//         operands.push(left && right);
-//       } else if (op == '|') {
-//         bool right = operands.top();
-//         operands.pop();
-//         bool left = operands.top();
-//         operands.pop();
-//         operands.push(left || right);
-//       }
-//     }
-//     gates[i].set_output(operands.top()); // cout<<"Test: "<<operands.top();
-//   }
-// }
 
 void circ::adjustInputs() {
   for (int i = 0; i < gates.size(); ++i) {
@@ -398,6 +279,7 @@ void circ::adjustInputs() {
           // Update the input value of the current gate with the output value of
           // the previous gate
           currentGate.set_inputs(j, inputName, gates[k].get_output().value);
+          currentGate.setInputTime(j, gates[k].get_output().timeStamp);
           break; // Stop searching for the input in previous gates once found
         }
       }
@@ -430,6 +312,7 @@ void circ::writeSim() {
          << endl; // Display error message if file creation failed
   } else {
     // Iterate through each gate in the circuit
+    // data out = gates[gates.size() - 1].get_output();
     for (int i = 0; i < numOfGates; i++) {
       // Get the output data of the current gate
       data out = gates[i].get_output();
@@ -439,15 +322,15 @@ void circ::writeSim() {
 
       // Write the input data of the current gate to the simulation file
       for (int j = 0; j < in.size(); j++) {
-        file << in[j].timeStamp << "," << in[j].name << ", " << in[j].value
+        file << in[j].timeStamp << ", " << in[j].name << ", " << in[j].value
              << endl; // Write input name and value
-      } 
-      
-      //we need to consider that each output will be output onto sim multiple times for different input times!!!
+      }
 
       // Write the output data of the current gate to the simulation file
-      file << out.timeStamp << "," << out.name << ", " << out.value
-           << endl; // Write output name and value
+      for (int j = 0; j < gates[i].get_gate_change_time().size(); j++) {
+        file << gates[i].get_gate_change_time()[j] << ", " << out.name << ", "
+             << out.value << endl; // Write input name and value
+      }
     }
   }
 
@@ -457,77 +340,102 @@ void circ::writeSim() {
 
 void circ::readExpression() {
   ifstream file;
-
   file.open(libFileName);
   string line, word;
-  stringstream ss(line);
   vector<string> info;
-  
+  map<string, int> gateDelay;
 
   while (getline(file, line)) {
     // Parse the line into words
+    info.clear();
+    stringstream ss(line); // Move stringstream initialization here
     while (getline(ss, word, ',')) {
       info.push_back(word);
     }
     removeSpaces(info);
-
+    for (int i = 0; i < info.size(); i++)
       gateExpression[info[0]] = info[2];
-    
-    }
-   for(auto & pair : gateExpression) {
-    cout << pair.first << ": " << pair.second << endl;
+    gateDelay[info[0]] = stoi(info[3]);
   }
-      // for (int i = 0; i < gates.size(); i++) {
-      //   string name = gates[i].get_component_name();
-      //   auto it = gateExpression.find(name);
-      //   if (it != gateExpression.end())
-      //   {
-      //     gates[i].set_output_expression(it->second);
-      //   }
-  //}
+
+  // for(auto it = gateExpression.begin(); it != gateExpression.end(); it++)
+  //   cout<<it->first<<" "<<it->second<<endl;
+
+  for (int i = 0; i < gates.size(); i++) {
+    string name = gates[i].get_component_name();
+    auto it = gateExpression.find(name);
+    if (it != gateExpression.end())
+      gates[i].set_output_expression(it->second);
+    auto it1 = gateDelay.find(name);
+    if (it1 != gateDelay.end())
+      gates[i].set_delay_ps(it1->second);
+  }
+
+  file.close();
 }
 
-// bool circ::evaluatePostfix(const string &expression) {
-//   stack<bool> operands;
-//   unordered_map<char, function<bool(bool, bool)>> operators = {
-//       {'&', [](bool a, bool b) { return a && b; }},
-//       {'|', [](bool a, bool b) { return a || b; }},
-//       {'~', [](bool a, bool) { return !a; }}};
-
-//   for (char c : expression) {
-//     if (isalpha(c)) { // Operand
-//       // Convert character to index and push the corresponding input onto the
-//       // stack
-//       int index = c - 'i';
-//       operands.push(inputs[index]);
-//     } else if (c == '~') { // Unary operator
-//       bool operand = operands.top();
-//       operands.pop();
-//       operands.push(operators[c](operand, false));
-//     } else { // Binary operator
-//       bool operand2 = operands.top();
-//       operands.pop();
-//       bool operand1 = operands.top();
-//       operands.pop();
-//       operands.push(operators[c](operand1, operand2));
-//     }
-//   }
-//   return operands.top();
-// }
-
-void circ::calculateDelay() { // still need to call it before outputting into sim file
-  vector<int> tempTimes; 
+void circ::evaluateOutput() {
   for (int i = 0; i < gates.size(); i++) {
+    vector<string> temp = gates[i].convertInfixToPostfix();
+    // for (int i = 0; i < temp.size(); i++)
+    //   cout << "Temp " << i << " " << temp[i] << endl;
+    bool val = gates[i].evaluatePostfixExpression(temp);
+    // cout<<"TEST: "<<val<<endl;
+    gates[i].setOutputValue(val);
+    adjustInputs();
+  }
+}
+
+void circ::calculateDelay() {
+
+  vector<int> tempTimes;
+
+  for (int i = 0; i < gates.size(); i++) {
+    if (i > 0) {
+      for (int k = i - 1; k >= 0; k--)
+        gates[i].updateInputs(gates[k].get_output());
+    }
+
+    tempTimes.resize(gates[i].get_inputs().size());
     for (int j = 0; j < gates[i].get_inputs().size(); j++) {
+
       tempTimes[j] = gates[i].get_inputs()[j].timeStamp;
-    } //copying the time stamps of the inputs into a temp vector
-    int index = 0; //represents the index of the gate_change_time vector
+
+    }              // copying the time stamps of the inputs into a temp vector
+    int index = 0; // represents the index of the gate_change_time vector
     while (!tempTimes.empty()) {
       auto minIter = min_element(tempTimes.begin(), tempTimes.end());
-      gates[i].set_gate_change_time(index,
-                                    (*minIter) + gates[i].get_delay_ps());
+      if (index > 0 && (gates[i].get_inputs()[index].timeStamp -
+           gates[i].get_inputs()[index - 1].timeStamp) <
+              gates[i].get_delay_ps() &&
+          (gates[i].get_inputs()[index].timeStamp -
+           gates[i].get_inputs()[index - 1].timeStamp) != 0) {
+        gates[i].setOutputTime(gates[i].get_gate_change_time()[index - 1] +
+                               gates[i].get_delay_ps());
+        
+        gates[i].set_gate_change_time(
+            index, gates[i].get_gate_change_time()[index - 1] +
+                       gates[i].get_delay_ps());
+      } else {
+        int newTime = (*minIter) + gates[i].get_delay_ps();
+        gates[i].setOutputTime(newTime);
+        ;
+        if (index > 0 && (gates[i].get_gate_change_time()[index - 1]) >=
+                             (gates[i].get_gate_change_time()[index])) {
+          gates[i].set_gate_change_time(
+              index, gates[i].get_gate_change_time()[index - 1]);
+          gates[i].setOutputTime(gates[i].get_gate_change_time()[index - 1]);
+        } else
+          gates[i].set_gate_change_time(index, newTime);
+      }
       tempTimes.erase(minIter);
-      index++; //looping over the inputs to find minimum time when an input was changed and setting the gate_change_time vector at the corresponding index and looping over until all inputs are considered
+
+      index++; // looping over the inputs to find minimum time when an input was
+               // changed and setting the gate_change_time vector at the
+               // corresponding index and looping over until all inputs are
+               // considered
     }
-  } //this will result in each gate having a vector of gate_change_time values that represent the times when the gate will change its output ordered ascendingly 
+  } // this will result in each gate having a vector of gate_change_time values
+    // that represent the times when the gate will change its output ordered
+    // ascendingly
 }

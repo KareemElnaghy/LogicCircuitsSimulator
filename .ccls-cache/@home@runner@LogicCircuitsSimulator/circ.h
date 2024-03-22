@@ -36,7 +36,7 @@ public:
   void removeSpaces(vector<string>& x);
   void removeSpacesMap();
   void printGate();
-  bool evaluatePostfix(const string& expression);
+  void evaluateOutput();
   void readExpression();
   void calculateDelay();
 };

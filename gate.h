@@ -32,7 +32,8 @@ public:
   vector<data> get_inputs();            // Returns the vector of input data
   void setOutputValue(bool out);        // Sets the output value of the gate
   void setOutputName(string name);      // Sets the output name of the gate
-  data get_output();                    // Returns the output data of the gate
+  void setOutputTime(int time);
+data get_output();                    // Returns the output data of the gate
   void set_component_name(string name); // Sets the gate type name
   string get_component_name();          // Returns the gate type name
   void set_num_of_inputs(int num);      // Sets the number of inputs to the gate
