@@ -1,14 +1,30 @@
 #include "circ.h"
 
 circ::circ() {
-  numOfInputsCircuit = 0;
+ // numOfInputsCircuit = 0;
   numOfGates = 0;
   circFileName = "";
   stimFileName = "";
+ 
 }
 
-void circ::printGate() {
-  cout << "Circuit" << endl;
+circ::circ(string circuit, string stim, string lib) {
+
+  circFileName = circuit; // Set circuit file name
+  stimFileName = stim;    // Set stimulus file name
+  libFileName = lib;      // Set library file name
+  countGates();             // Count the number of gates in the circuit
+  gates.resize(numOfGates); // Resize the gates vector to accommodate gates
+  readStim();  // Read stimulus values from the stimulus file
+  readCirc();  // Read circuit from the circuit file
+  readExpression();  // Read the output expression from the library file
+  calculateAllTimestamps();  // Calculate the timestamps of all gates in the circuit
+  writeSim(); // writes stimuli values to the stim file
+  // printGate();  
+}
+
+void circ::printGates() {
+  cout << "New Circuit" << endl;
   for (int i = 0; i < numOfGates; i++) {
     cout << gates[i].get_component_name() << endl;
     // cout << gates[i].get_num_of_inputs() << endl;
@@ -17,7 +33,7 @@ void circ::printGate() {
          << " Value: " << gates[i].get_output().value
          << " Time: " << gates[i].get_output().timeStamp << endl;
 
-    // cout << gates[i].get_output_expression() << endl;
+    cout<<endl;
   }
 }
 
@@ -79,63 +95,10 @@ void circ::removeSpacesMap() {
   }
 }
 
-circ::circ(string circuit, string stim, string lib) {
-
-  circFileName = circuit;   // Set circuit file name
-  stimFileName = stim;      // Set stimulus file name
-  libFileName = lib;        // Set library file name
-  countInputs();            // Count the number of inputs in the circuit
-  countGates();             // Count the number of gates in the circuit
-  gates.resize(numOfGates); // Resize the gates vector to accommodate gates
- // cout << "Test 1" << endl;
-  readStim();
- // cout << "Test 2" << endl;
-  // reads stimulus file
-  parse();
- // cout << "Test 3" << endl; // Parse the circuit file to initialize gate objects
-  readExpression();
- // cout << "Test 4" << endl;
-  evaluateOutput();
-  //cout << "Test 5" << endl;
-
-  calculateDelay();
- // cout << "Test 6" << endl;
-  writeSim(); // writes stimuli values to the stim file
-
-  printGate();
-}
-
-void circ::countInputs() {
-  ifstream file(circFileName);
-  if (!file.is_open()) {
-    cout << "Error: Unable to open file." << endl;
-    return;
-  }
-
-  string line;
-  int lineCount = 0;
-  bool foundInputs = false;
-
-  while (getline(file, line)) {
-
-    if (line == "COMPONENTS:") {
-      break; // Stop reading when COMPONENTS is found
-    }
-
-    if (foundInputs) {
-      lineCount++; // Increment line count after finding INPUTS
-    } else if (line == "INPUTS:") {
-      foundInputs = true; // Mark that INPUTS is found
-    }
-  }
-
-  file.close();
-
-  numOfInputsCircuit = lineCount;
-}
 
 void circ::countGates() {
   ifstream file(circFileName); // Open circuit file for reading
+  
   if (!file.is_open()) {
     cout << "Error: Unable to open file."
          << endl; // Error message if file cannot be opened
@@ -190,7 +153,7 @@ void circ::readStim() {
   }
 }
 
-void circ::parse() {
+void circ::readCirc() {
   ifstream file(circFileName); // Open circuit file for reading
   // int inputCounter = 0; // Counter for tracking input index
 
@@ -266,7 +229,7 @@ void circ::parse() {
   file.close();
 }
 
-void circ::adjustInputs() {
+void circ::adjust() {
   for (int i = 0; i < gates.size(); ++i) {
     gate &currentGate = gates[i]; // Current gate
     // Iterate over the inputs of the current gate
@@ -290,52 +253,57 @@ void circ::adjustInputs() {
 void circ::writeSim() {
   fstream file;       // File stream object for writing to the simulation file
   string simFileName; // Variable to store the simulation file name
-
+  vector<data> sim;
   // Determine the simulation file name based on the circuit file name
-  if (circFileName == "circuit1.txt")
-    simFileName = "simCircuit1.txt";
-  else if (circFileName == "circuit2.txt")
-    simFileName = "simCircuit2.txt";
-  else if (circFileName == "circuit3.txt")
-    simFileName = "simCircuit3.txt";
-  else if (circFileName == "circuit4.txt")
-    simFileName = "simCircuit4.txt";
+  if (circFileName == "circuit1.cir")
+    simFileName = "simCircuit1.sim";
+  else if (circFileName == "circuit2.cir")
+    simFileName = "simCircuit2.sim";
+  else if (circFileName == "circuit3.cir")
+    simFileName = "simCircuit3.sim";
+  else if (circFileName == "circuit4.cir")
+    simFileName = "simCircuit4.sim";
   else
-    simFileName = "simCircuit5.txt";
+    simFileName = "simCircuit5.sim";
 
   // Open the simulation file for writing
   file.open(simFileName, ios::out);
 
   // Check if the file was successfully opened
   if (!file.is_open()) {
-    cout << "Error creating sim file."
-         << endl; // Display error message if file creation failed
+    cout << "Error creating sim file." << endl; // Display error message if file creation failed
   } else {
     // Iterate through each gate in the circuit
-    // data out = gates[gates.size() - 1].get_output();
-    for (int i = 0; i < numOfGates; i++) {
-      // Get the output data of the current gate
-      data out = gates[i].get_output();
 
-      // Get the input data of the current gate
-      vector<data> in = gates[i].get_inputs();
+    for (int i = 0; i < gates.size(); i++) {
 
-      // Write the input data of the current gate to the simulation file
-      for (int j = 0; j < in.size(); j++) {
-        file << in[j].timeStamp << ", " << in[j].name << ", " << in[j].value
-             << endl; // Write input name and value
+      data temp1, temp2;
+
+      for (int j = 0; j < gates[i].get_num_of_inputs(); j++) {
+        temp2.value = gates[i].get_inputs()[j].value;
+        temp2.name = gates[i].get_inputs()[j].name;
+        temp2.timeStamp = gates[i].get_inputs()[j].timeStamp;
+        sim.push_back(temp2);
       }
-
-      // Write the output data of the current gate to the simulation file
-      for (int j = 0; j < gates[i].get_gate_change_time().size(); j++) {
-        file << gates[i].get_gate_change_time()[j] << ", " << out.name << ", "
-             << out.value << endl; // Write input name and value
-      }
+      temp1.value = gates[i].get_output().value;
+      temp1.name = gates[i].get_output().name;
+      temp1.timeStamp = gates[i].get_output().timeStamp;
+      sim.push_back(temp1);
     }
-  }
 
-  // Close the simulation file
-  file.close();
+    // Sort the vector
+    sort(sim.begin(), sim.end(), data::compare);
+
+    removeDuplicates(sim);
+
+    for (int i = 0; i < sim.size(); i++) {
+      file << sim[i].timeStamp << ", " << sim[i].name << ", " << sim[i].value
+           << endl;
+    }
+    
+    // Close the simulation file
+    file.close();
+  }
 }
 
 void circ::readExpression() {
@@ -345,22 +313,22 @@ void circ::readExpression() {
   vector<string> info;
   map<string, int> gateDelay;
 
+  // Read each line from the file
   while (getline(file, line)) {
-    // Parse the line into words
     info.clear();
-    stringstream ss(line); // Move stringstream initialization here
+    stringstream ss(line); // Initialize stringstream to parse the line into words
     while (getline(ss, word, ',')) {
-      info.push_back(word);
+      info.push_back(word); // Store each word in the vector
     }
-    removeSpaces(info);
-    for (int i = 0; i < info.size(); i++)
+    removeSpaces(info); // Remove any spaces from the words
+    // Store gate expressions and delays in respective maps
+    for (int i = 0; i < info.size(); i++) {
       gateExpression[info[0]] = info[2];
-    gateDelay[info[0]] = stoi(info[3]);
+      gateDelay[info[0]] = stoi(info[3]);
+    }
   }
 
-  // for(auto it = gateExpression.begin(); it != gateExpression.end(); it++)
-  //   cout<<it->first<<" "<<it->second<<endl;
-
+  // Set output expressions and delays for each gate
   for (int i = 0; i < gates.size(); i++) {
     string name = gates[i].get_component_name();
     auto it = gateExpression.find(name);
@@ -371,71 +339,27 @@ void circ::readExpression() {
       gates[i].set_delay_ps(it1->second);
   }
 
-  file.close();
+  file.close(); // Close the file
 }
 
-void circ::evaluateOutput() {
+void circ::calculateAllTimestamps() {
+  // Iterate through all gates in the circuit
   for (int i = 0; i < gates.size(); i++) {
-    vector<string> temp = gates[i].convertInfixToPostfix();
-    // for (int i = 0; i < temp.size(); i++)
-    //   cout << "Temp " << i << " " << temp[i] << endl;
-    bool val = gates[i].evaluatePostfixExpression(temp);
-    // cout<<"TEST: "<<val<<endl;
-    gates[i].setOutputValue(val);
-    adjustInputs();
+    // Calculate timestamp for the current gate
+    gates[i].evaluateTimestamp();
+    // Adjust gates in the circuit based on the new timestamps
+    adjust();
   }
 }
 
-void circ::calculateDelay() {
-
-  vector<int> tempTimes;
-
-  for (int i = 0; i < gates.size(); i++) {
-    if (i > 0) {
-      for (int k = i - 1; k >= 0; k--)
-        gates[i].updateInputs(gates[k].get_output());
+void circ::removeDuplicates(vector<data> &x) {
+  // Iterate through the vector of data
+  for (int i = 0; i < x.size(); i++) {
+    // Compare each element with subsequent elements to find duplicates
+    for (int j = i + 1; j < x.size(); j++) {
+      // If a duplicate is found, remove it from the vector
+      if (x[i] == x[j])
+        x.erase(x.begin() + j);
     }
-
-    tempTimes.resize(gates[i].get_inputs().size());
-    for (int j = 0; j < gates[i].get_inputs().size(); j++) {
-
-      tempTimes[j] = gates[i].get_inputs()[j].timeStamp;
-
-    }              // copying the time stamps of the inputs into a temp vector
-    int index = 0; // represents the index of the gate_change_time vector
-    while (!tempTimes.empty()) {
-      auto minIter = min_element(tempTimes.begin(), tempTimes.end());
-      if (index > 0 && (gates[i].get_inputs()[index].timeStamp -
-           gates[i].get_inputs()[index - 1].timeStamp) <
-              gates[i].get_delay_ps() &&
-          (gates[i].get_inputs()[index].timeStamp -
-           gates[i].get_inputs()[index - 1].timeStamp) != 0) {
-        gates[i].setOutputTime(gates[i].get_gate_change_time()[index - 1] +
-                               gates[i].get_delay_ps());
-        
-        gates[i].set_gate_change_time(
-            index, gates[i].get_gate_change_time()[index - 1] +
-                       gates[i].get_delay_ps());
-      } else {
-        int newTime = (*minIter) + gates[i].get_delay_ps();
-        gates[i].setOutputTime(newTime);
-        ;
-        if (index > 0 && (gates[i].get_gate_change_time()[index - 1]) >=
-                             (gates[i].get_gate_change_time()[index])) {
-          gates[i].set_gate_change_time(
-              index, gates[i].get_gate_change_time()[index - 1]);
-          gates[i].setOutputTime(gates[i].get_gate_change_time()[index - 1]);
-        } else
-          gates[i].set_gate_change_time(index, newTime);
-      }
-      tempTimes.erase(minIter);
-
-      index++; // looping over the inputs to find minimum time when an input was
-               // changed and setting the gate_change_time vector at the
-               // corresponding index and looping over until all inputs are
-               // considered
-    }
-  } // this will result in each gate having a vector of gate_change_time values
-    // that represent the times when the gate will change its output ordered
-    // ascendingly
+  }
 }
