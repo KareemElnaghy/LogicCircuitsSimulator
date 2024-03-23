@@ -1,4 +1,4 @@
-name: C++ Build and Test
+name: C/C++ CI
 
 on:
   push:
@@ -10,17 +10,26 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Install g++
-        run: sudo apt-get install g++
+    - name: Set up C++ build environment
+      uses: actions/setup-cpp@v2
+      with:
+        compiler: 'gcc-11'
+        cxx-compiler: 'g++-11'
 
-      - name: Build
-        run: g++ -o main src/*.cpp
+    - name: Build
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make
 
-      - name: Run Tests
-        run: ./main
+    - name: Run tests
+      run: |
+        cd build
+        ctest
