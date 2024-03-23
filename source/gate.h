@@ -58,4 +58,5 @@ public:
   vector<string> convertExpression();   // Converts the gate expression to postfix notation
   bool evaluateExpression(const vector<string> &postfix); // Evaluates the output expression
   void evaluateTimestamp();             // Evaluates the timestamp of the gate
+  void updateInputs(data in);    // Updates the value of a specific input of the gate
 };
