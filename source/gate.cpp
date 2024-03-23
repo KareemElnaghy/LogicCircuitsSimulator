@@ -178,13 +178,13 @@ void gate::evaluateTimestamp() {
   setOutputTime(maxElement->timeStamp + delay_ps);    // Sets the output time stamp to the maximum time stamp plus the delay
 }
 
-void gate::updateInputs(data in)
+void gate::updateInputs(data in)    // Receives data on specific input
 {
   for(int i=0; i<inputs.size(); i++)
     {
-      if(inputs[i].name == in.name)
+      if(inputs[i].name == in.name)    // Searches for the input by name
       {
-        inputs[i].value = in.value;
+        inputs[i].value = in.value;    // Assigns updated value and timestamp
         inputs[i].timeStamp = in.timeStamp;
       }
     }

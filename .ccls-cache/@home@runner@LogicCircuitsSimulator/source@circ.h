@@ -1,3 +1,6 @@
+#ifndef CIRC_H
+#define CIRC_H
+
 #include "gate.h"
 #include <algorithm>
 #include <climits>
@@ -38,3 +41,5 @@ public:
   void printGates();
 
 };
+
+#endif CIRC_H
