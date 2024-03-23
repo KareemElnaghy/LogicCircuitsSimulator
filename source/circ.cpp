@@ -1,32 +1,5 @@
 #include "circ.h"
 
-// // Function to sort a map by values and return a new map
-// void sortMapByValue(map<string, int> &inputMap) {
-//   vector<data> vec;
-
-//   for (auto it = inputMap.begin(); it != inputMap.end(); it++) {
-//     data temp;
-//     temp.name = it->first;
-//     temp.timeStamp = it->second;
-
-//     vec.push_back(temp);
-//   }
-
-//   sort(vec.begin(), vec.end(), data::compare);
-
-//   map<string, int> sortedMap;
-
-//   for (int i = 0; i < vec.size(); i++) {
-//     sortedMap[vec[i].name] = vec[i].timeStamp;
-//   }
-
-//   inputMap.clear();
-
-//   // Re-insert elements into the input map in sorted order
-//   for (auto it = sortedMap.begin(); it != sortedMap.end(); it++) {
-//     inputMap[it->first] = it->second;
-//   }
-// }
 
 circ::circ() {
   // numOfInputsCircuit = 0;
