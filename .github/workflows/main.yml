@@ -1,0 +1,26 @@
+name: C++ Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install g++
+        run: sudo apt-get install g++
+
+      - name: Build
+        run: g++ -o main src/*.cpp
+
+      - name: Run Tests
+        run: ./main
