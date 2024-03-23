@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -19,8 +18,8 @@ jobs:
     - name: Set up C++ build environment
       uses: actions/setup-cpp@v2
       with:
-        compiler: 'gcc-11'
-        cxx-compiler: 'g++-11'
+        compiler: 'gcc'
+        compiler-version: '11'
 
     - name: Build
       run: |
