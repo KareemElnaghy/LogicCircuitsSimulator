@@ -11,6 +11,26 @@ This project is a circuit simulator implemented in C++. It allows users to read 
 - Event-Driven Simulation
 - Error handling for invalid circuit descriptions
 
+## Data Structures
+
+To efficiently manage the components of the logic circuit, such as gates, wires, and input/output signals, we relied on four main data structures: priority queues, maps, vectors, and structs.
+
+### Priority Queue
+
+The main data structure used to implement the event-driven simulator was the priority queue. The queue here acts as an activity list that stores the active gates, making processing and outputting the gates very easy to implement and based on changing events.
+
+### Maps
+
+We used maps to store operator precedence as well as to store our logic gates’ expressions. We used maps here because they make it easy and efficient to access data given a specific key, which in our case, was the name of our component.
+
+### Vectors
+
+Vectors were used to store our inputs that we read from the circuit files, and to store the gates used for a given circuit. Moreover, they were used to store the input information that we read from the stimuli file which we used throughout the code. Also, vectors were used as temporary containers used for reading from the files. Vectors were used here instead of arrays because of their ability to be resized and for the ease with which elements can be added to or removed from them.
+
+### Struct
+
+We created a struct in the gate class called DataStruct which can store three attributes: a name, value, and timestamp. This struct is responsible for allowing us to store information on the events during our simulation such as changes in the input and changes in the gate outputs.
+
 ## Event-Driven Simulation
 
 This circuit simulator employs an event-driven simulation approach to model the behavior of logic circuits. In event-driven simulation, the simulator maintains a priority queue of events, where each event represents a change in the circuit's state, such as an input change or a gate output change. The events are processed in chronological order based on their timestamp.
